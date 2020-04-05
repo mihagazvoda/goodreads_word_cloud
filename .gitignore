@@ -1,0 +1,6 @@
+*.Rproj
+.DS_Store
+.Rproj.user/
+*.rds
+*.csv
+.Rhistory

@@ -1,0 +1,5 @@
+library(readr)
+library(rvest)
+library(purrr)
+library(stringr)
+library(tibble)
