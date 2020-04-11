@@ -5,7 +5,9 @@ start_url <- "https://www.goodreads.com/review/list/31076100-miha-gazvoda"
 #TODO add function of rates
 # get_book_details <- function(book_link) {}
 
-get_book_description <- function(book_link) {
+get_description <- function(book_link) {
+  Sys.sleep(0.1)
+  
   url <- str_c(goodreads_url, book_link)
   read_html(url) %>%
     html_node("#descriptionContainer") %>%
@@ -14,10 +16,12 @@ get_book_description <- function(book_link) {
 }
 
 get_genres <- function(book_link){
+  Sys.sleep(0.1)
+  
   url <- paste0(goodreads_url, book_link)
   html_file <- read_html(url)
   
-  # TODO there can be multiple 
+  # TODO there can be multiple genres in one row
   genre <- html_file %>%
     html_nodes(".left .bookPageGenreLink") %>% 
     html_text()
@@ -31,7 +35,7 @@ get_genres <- function(book_link){
   list(genre, n_shelved)
 }
 
-get_books <- function(i) {
+get_books_from_page <- function(i) {
   cat(i, "\n")
   url <- str_c(start_url, "?page=", i, "&shelf=read")
   
@@ -58,7 +62,7 @@ get_books <- function(i) {
     unique()
   
   book_description <- book_links %>%
-    map_chr(get_book_description)
+    map_chr(get_description)
 
   book_genres <- book_links %>%
     map(get_genres)
@@ -69,4 +73,21 @@ get_books <- function(i) {
     book_description,
     book_genres
   )
+}
+
+save_rds <- function(file, path) {
+  readr::write_rds(file, path = path)
+  invisible(file)
+}
+
+get_books <- function(path) {
+  books <- if (file.exists(path)) {
+    readr::read_rds(path)
+  } else {
+    c(1:1) %>% 
+      map_dfr(get_books_from_page) %>% 
+      save_rds(path)
+  }
+  
+  books
 }
