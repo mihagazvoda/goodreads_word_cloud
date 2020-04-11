@@ -1,8 +1,9 @@
 # About
 
-This is a project to create a word cloud from the topics I read about.  
-Great source (but not an inspiration): https://maraaverick.rbind.io/2017/10/goodreads-part-2/.
-
-## Installation
+This is a project to create a word cloud from the topics I read about. Data used is from my Goodreads account.    
+I reused some code from Mava Averick's post [Goodreads Part 2: rvesting descriptions](https://maraaverick.rbind.io/2017/10/goodreads-part-2/). Thanks!
 
 ## Usage
+Run `drake::r_make()` to run or update the whole workflow.
+
+
