@@ -2,12 +2,11 @@ goodreads_url <- "https://www.goodreads.com"
 start_url <- "https://www.goodreads.com/review/list/31076100-miha-gazvoda"
 
 # TODO function to get book descriptions and genres
-# TODO add function of rates
 # get_book_details <- function(book_link) {}
 
 get_books <- function(i) {
   cat(i, "\n")
-  url <- str_c(start_url, "?page=", i, "&shelf=read")
+  url <- str_c(start_url, "?page=", i)
 
   html <- read_html(url)
 
@@ -20,7 +19,11 @@ get_books <- function(i) {
     html_nodes(".author a") %>%
     html_text(trim = TRUE) %>%
     discard(str_detect(., "^\\("))
-
+  
+  rating <- html %>% 
+    html_nodes("[class=' staticStars notranslate']") %>% 
+    html_attr("title")
+  
   # date_read <- html %>%
   #   html_nodes("span.date_read_value") %>%
   #   html_text()
@@ -41,6 +44,7 @@ get_books <- function(i) {
   tibble(
     title,
     author,
+    rating,
     description,
     genres
   )
