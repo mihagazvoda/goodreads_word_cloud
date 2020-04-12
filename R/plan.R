@@ -1,3 +1,3 @@
 plan <- drake_plan(
-  books = get_books("./data/goodreads_books.rds")
+  books = map_dfr(c(1:1), get_books)
 )

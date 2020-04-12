@@ -5,19 +5,7 @@ start_url <- "https://www.goodreads.com/review/list/31076100-miha-gazvoda"
 # TODO add function of rates
 # get_book_details <- function(book_link) {}
 
-get_books <- function(path) {
-  books <- if (file.exists(path)) {
-    readr::read_rds(path)
-  } else {
-    c(1:1) %>%
-      map_dfr(get_books_from_page) %>%
-      save_rds(path)
-  }
-
-  books
-}
-
-get_books_from_page <- function(i) {
+get_books <- function(i) {
   cat(i, "\n")
   url <- str_c(start_url, "?page=", i, "&shelf=read")
 
@@ -26,7 +14,8 @@ get_books_from_page <- function(i) {
   title <- html %>%
     html_nodes(".title a") %>%
     html_text(trim = TRUE)
-
+  
+  # TODO only returns first author
   author <- html %>%
     html_nodes(".author a") %>%
     html_text(trim = TRUE) %>%
@@ -69,25 +58,31 @@ get_description <- function(book_link) {
 
 get_genres <- function(book_link) {
   Sys.sleep(0.1)
-
+  
   url <- paste0(goodreads_url, book_link)
   html_file <- read_html(url)
+  
+  genres <- html_file %>%
+    html_nodes(".elementList") %>% 
+    map(get_genre) %>% 
+    tibble()
+}
 
-  # TODO there can be multiple genres in one row
-  genre <- html_file %>%
+# change to iteratoe over book page genre link?
+get_genre <- function(html_file) {
+  genre_name <- html_file %>%
     html_nodes(".left .bookPageGenreLink") %>%
-    html_text()
-
+    html_text() 
+  
   n_shelved <- html_file %>%
     html_nodes(".right .bookPageGenreLink") %>%
     html_text() %>%
     parse_number() %>%
     as.integer()
-
-  list(genre, n_shelved)
-}
-
-save_rds <- function(file, path) {
-  readr::write_rds(file, path = path)
-  invisible(file)
+  
+  tibble(
+    genre_category = genre_name[1], 
+    genre_subcategory = genre_name[2], 
+    n_shelved
+    )
 }
