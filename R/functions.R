@@ -43,10 +43,10 @@ get_books_from_page <- function(i) {
     na.omit() %>%
     unique()
 
-  book_description <- book_links %>%
+  description <- book_links %>%
     map_chr(get_description)
 
-  book_genres <- book_links %>%
+  genres <- book_links %>%
     map(get_genres)
 
   tibble(
