@@ -52,8 +52,8 @@ get_books_from_page <- function(i) {
   tibble(
     title,
     author,
-    book_description,
-    book_genres
+    description,
+    genres
   )
 }
 
