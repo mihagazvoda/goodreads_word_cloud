@@ -1,10 +1,5 @@
-# TODO move
-goodreads_url <- "https://www.goodreads.com"
-start_url <- "https://www.goodreads.com/review/list/31076100-miha-gazvoda"
 # TODO add checking robots.txt
-# TODO might be good idea to show topics over time
 # TODO function to get book descriptions and genres
-# get_book_details <- function(book_link) {}
 
 get_books <- function(i) {
   cat(i, "\n")
@@ -97,8 +92,6 @@ get_genre <- function(html_file) {
 }
 
 summarise_genres <- function(books) {
-  # TODO does it make sense to filter some words? 
-  
   unnested_books <- books %>%
     unnest(genres) %>%
     unnest(cols = c(.)) %>%
@@ -108,14 +101,16 @@ summarise_genres <- function(books) {
     )
 
   weighted_genres <- unnested_books %>%
-    filter(!is.na(rating)) %>%
+    filter(!is.na(rating)) %>% 
     group_by(author, title) %>%
     mutate(
-      p_genre = n_shelved / sum(n_shelved),
-      genre_weight = p_genre * rating
+      p_genre = n_shelved / sum(n_shelved)
     ) %>%
     group_by(genre) %>%
-    summarise(weight = sum(genre_weight))
+    summarise(
+      popularity = sum(p_genre),
+      rating = mean(rating)
+      )
 
   weighted_genres
 }
@@ -133,7 +128,8 @@ recode_rating <- function(rating) {
 }
 
 plot_word_cloud <- function(weighted_genres) {
-  ggplot(weighted_genres, aes(label = genre, size = weight)) +
-    geom_text_wordcloud(eccentricity = 1.25) +
-    theme_minimal()
+  ggplot(weighted_genres, aes(label = genre, size = popularity, color = rating)) +
+    geom_text_wordcloud() +
+    theme_minimal() + 
+    viridis::scale_color_viridis()
 }
